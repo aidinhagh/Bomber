@@ -2,246 +2,72 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Protocol: OMEGA - Device Assembly</title>
-    <!-- Tailwind CSS for styling -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Protocol: OMEGA</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Custom Neon Effects */
-        :root {
-            --neon-green: #39ff14;
-            --neon-red: #ff073a;
-            --neon-blue: #00f3ff;
-            --neon-orange: #ffaa00;
-            --bg-dark: #0a0a0f;
-        }
-        
-        body {
-            background-color: var(--bg-dark);
-            color: #e0e0e0;
-            font-family: 'Courier New', Courier, monospace;
-            overflow-x: hidden;
-            user-select: none;
-            transition: background-color 0.5s;
-        }
-
-        .crt-overlay {
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 2px, 3px 100%;
-            pointer-events: none;
-        }
-
-        .slot {
-            transition: all 0.3s ease;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
-        }
-
-        .slot.active {
-            border-color: var(--neon-blue);
-            box-shadow: 0 0 15px var(--neon-blue);
-        }
-
-        .item {
-            transition: transform 0.2s, box-shadow 0.2s;
-            cursor: pointer;
-        }
-        
-        .item:active {
-            transform: scale(0.95);
-        }
-
-        .item.selected {
-            border-color: var(--neon-green);
-            box-shadow: 0 0 10px var(--neon-green);
-            background-color: rgba(57, 255, 20, 0.1);
-        }
-
-        .item.placed {
-            opacity: 0.5;
-            pointer-events: none;
-            filter: grayscale(100%);
-        }
-
-        /* Glitch Animation */
-        @keyframes glitch {
-            0% { transform: translate(0) }
-            20% { transform: translate(-2px, 2px) }
-            40% { transform: translate(-2px, -2px) }
-            60% { transform: translate(2px, 2px) }
-            80% { transform: translate(2px, -2px) }
-            100% { transform: translate(0) }
-        }
-        
-        .glitch-text {
-            animation: glitch 2s infinite;
-            text-shadow: 2px 2px var(--neon-red);
-        }
-
-        /* Screen Shake for High Instability */
-        @keyframes shake {
-            0% { transform: translate(1px, 1px) rotate(0deg); }
-            10% { transform: translate(-1px, -2px) rotate(-1deg); }
-            20% { transform: translate(-3px, 0px) rotate(1deg); }
-            30% { transform: translate(3px, 2px) rotate(0deg); }
-            40% { transform: translate(1px, -1px) rotate(1deg); }
-            50% { transform: translate(-1px, 2px) rotate(-1deg); }
-            60% { transform: translate(-3px, 1px) rotate(0deg); }
-            70% { transform: translate(3px, 1px) rotate(-1deg); }
-            80% { transform: translate(-1px, -1px) rotate(1deg); }
-            90% { transform: translate(1px, 2px) rotate(0deg); }
-            100% { transform: translate(1px, -2px) rotate(-1deg); }
-        }
-
-        .shake {
-            animation: shake 0.5s;
-            animation-iteration-count: infinite;
-        }
-
-        .danger-bg {
-            background-color: #2a0a0a;
-        }
-
-        #final-score {
-            font-size: 5rem;
-            font-weight: 900;
-        }
+        :root { --bg-dark: #0a0a0f; }
+        body { background-color: var(--bg-dark); color: #e0e0e0; font-family: 'Courier New', Courier, monospace; overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent; }
+        .crt-overlay { background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06)); background-size: 100% 2px, 3px 100%; pointer-events: none; }
+        .slot { transition: all 0.3s ease; box-shadow: inset 0 0 10px rgba(0,0,0,0.8); }
+        .slot.active { border-color: #00f3ff; box-shadow: 0 0 15px #00f3ff; }
+        .item.selected { border-color: #39ff14; box-shadow: 0 0 10px #39ff14; background-color: rgba(57, 255, 20, 0.1); }
+        .item.placed { opacity: 0.5; pointer-events: none; filter: grayscale(100%); }
+        .glitch-text { animation: glitch 2s infinite; text-shadow: 2px 2px #ff073a; }
+        @keyframes glitch { 0%, 100% { transform: translate(0) } 20% { transform: translate(-2px, 2px) } 40% { transform: translate(-2px, -2px) } 60% { transform: translate(2px, 2px) } 80% { transform: translate(2px, -2px) } }
+        @keyframes shake { 0%, 100% { transform: translate(0,0) } 10%, 30%, 50%, 70%, 90% { transform: translate(-2px, -1px) } 20%, 40%, 60%, 80% { transform: translate(2px, 1px) } }
+        .shake { animation: shake 0.5s infinite; }
+        .danger-bg { background-color: #2a0a0a; }
     </style>
 </head>
-<body class="h-screen flex flex-col items-center justify-between p-4 relative" id="game-body">
-
-    <!-- CRT Screen Effect Overlay -->
+<body class="h-screen w-screen flex flex-col items-center justify-between p-4 relative overflow-hidden" id="game-body">
     <div class="crt-overlay fixed inset-0 z-50 pointer-events-none"></div>
 
-    <!-- Header & Timer -->
     <header class="w-full max-w-lg flex flex-col gap-2 z-10">
         <div class="flex justify-between items-end border-b-2 border-green-500 pb-2">
             <h1 class="text-2xl font-bold text-green-500 glitch-text tracking-widest">PROTOCOL: OMEGA</h1>
             <div id="timer-display" class="text-3xl font-mono text-red-500 font-bold">45.00</div>
         </div>
-        <!-- Progress Bar -->
-        <div class="w-full h-2 bg-gray-800 rounded overflow-hidden">
-            <div id="timer-bar" class="h-full bg-red-600 w-full transition-all duration-100"></div>
-        </div>
+        <div class="w-full h-2 bg-gray-800 rounded overflow-hidden"><div id="timer-bar" class="h-full bg-red-600 w-full transition-all duration-100"></div></div>
     </header>
 
-    <!-- Game Area -->
     <main id="game-screen" class="flex-1 w-full max-w-lg flex flex-col gap-4 py-4 z-10">
-        
-        <!-- Reactor Instability -->
         <div class="bg-gray-900 border border-orange-800 p-2 rounded shadow-lg flex items-center justify-between gap-4">
             <div class="flex-1">
-                <div class="flex justify-between text-xs text-orange-500 mb-1 uppercase font-bold tracking-widest">
-                    <span>Reactor Flux</span>
-                    <span id="instability-text">0%</span>
-                </div>
-                <div class="w-full h-4 bg-gray-800 rounded overflow-hidden border border-orange-900">
-                    <div id="instability-bar" class="h-full bg-orange-500 w-0 transition-all duration-75"></div>
-                </div>
+                <div class="flex justify-between text-xs text-orange-500 mb-1 uppercase font-bold tracking-widest"><span>Reactor Flux</span><span id="instability-text">0%</span></div>
+                <div class="w-full h-4 bg-gray-800 rounded overflow-hidden border border-orange-900"><div id="instability-bar" class="h-full bg-orange-500 w-0 transition-all duration-75"></div></div>
             </div>
-            <button onclick="purgeHeat()" class="bg-orange-900 hover:bg-orange-700 text-orange-100 text-xs font-bold px-4 py-3 rounded border border-orange-600 active:scale-95 transition-all uppercase tracking-wider">
-                <i class="fa-solid fa-fan animate-spin"></i> Purge
-            </button>
+            <button onclick="purgeHeat()" class="bg-orange-900 hover:bg-orange-700 text-orange-100 text-xs font-bold px-4 py-3 rounded border border-orange-600 active:scale-95 transition-all uppercase tracking-wider touch-manipulation"><i class="fa-solid fa-fan animate-spin"></i> Purge</button>
         </div>
-
-        <!-- The Puzzle Clues -->
-        <div class="bg-gray-900 border border-green-800 p-4 rounded text-sm md:text-base shadow-lg">
-            <h3 class="text-green-400 font-bold mb-2 border-b border-green-900 inline-block">BLUEPRINT LOGIC:</h3>
-            <ul id="clue-list" class="space-y-2 text-gray-300 font-mono list-disc pl-4">
-                <!-- Clues injected by JS -->
-                <li>Initializing decryption...</li>
-            </ul>
-        </div>
-
-        <!-- Assembly Slots (The Bomb Chassis) -->
-        <div class="flex flex-col gap-2">
-            <div class="text-xs text-center text-gray-500 tracking-widest">ASSEMBLY SEQUENCE</div>
-            <!-- UPDATED to grid-cols-5 -->
-            <div class="grid grid-cols-5 gap-2 h-20 md:h-24">
-                <!-- Slot 1 -->
-                <div class="slot border-2 border-dashed border-gray-600 rounded bg-black/50 flex items-center justify-center relative cursor-pointer hover:border-gray-500" onclick="handleSlotClick(0)">
-                    <span class="absolute top-1 left-2 text-xs text-gray-600 font-bold">I</span>
-                    <div id="slot-0-content" class="text-3xl text-gray-700"><i class="fa-solid fa-plus"></i></div>
-                </div>
-                <!-- Slot 2 -->
-                <div class="slot border-2 border-dashed border-gray-600 rounded bg-black/50 flex items-center justify-center relative cursor-pointer hover:border-gray-500" onclick="handleSlotClick(1)">
-                    <span class="absolute top-1 left-2 text-xs text-gray-600 font-bold">II</span>
-                    <div id="slot-1-content" class="text-3xl text-gray-700"><i class="fa-solid fa-plus"></i></div>
-                </div>
-                <!-- Slot 3 -->
-                <div class="slot border-2 border-dashed border-gray-600 rounded bg-black/50 flex items-center justify-center relative cursor-pointer hover:border-gray-500" onclick="handleSlotClick(2)">
-                    <span class="absolute top-1 left-2 text-xs text-gray-600 font-bold">III</span>
-                    <div id="slot-2-content" class="text-3xl text-gray-700"><i class="fa-solid fa-plus"></i></div>
-                </div>
-                <!-- Slot 4 -->
-                <div class="slot border-2 border-dashed border-gray-600 rounded bg-black/50 flex items-center justify-center relative cursor-pointer hover:border-gray-500" onclick="handleSlotClick(3)">
-                    <span class="absolute top-1 left-2 text-xs text-gray-600 font-bold">IV</span>
-                    <div id="slot-3-content" class="text-3xl text-gray-700"><i class="fa-solid fa-plus"></i></div>
-                </div>
-                <!-- Slot 5 (NEW) -->
-                <div class="slot border-2 border-dashed border-gray-600 rounded bg-black/50 flex items-center justify-center relative cursor-pointer hover:border-gray-500" onclick="handleSlotClick(4)">
-                    <span class="absolute top-1 left-2 text-xs text-gray-600 font-bold">V</span>
-                    <div id="slot-4-content" class="text-3xl text-gray-700"><i class="fa-solid fa-plus"></i></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Inventory (Parts) -->
-        <div class="flex-1 flex flex-col justify-end">
-            <div class="text-xs text-center text-gray-500 mb-2 tracking-widest">AVAILABLE COMPONENTS</div>
-            <!-- UPDATED to grid-cols-5 -->
-            <div id="inventory" class="grid grid-cols-5 gap-2 md:gap-3">
-                <!-- Parts injected by JS -->
-            </div>
-        </div>
-        
-        <!-- Action Button -->
-        <button onclick="checkSolution()" class="w-full bg-green-900 hover:bg-green-700 text-green-100 font-bold py-4 rounded border border-green-500 shadow-[0_0_15px_rgba(0,255,0,0.3)] transition-all active:scale-95 uppercase tracking-widest mt-2">
-            <i class="fa-solid fa-power-off mr-2"></i> Initiate Sequence
-        </button>
+        <div class="bg-gray-900 border border-green-800 p-4 rounded text-sm md:text-base shadow-lg"><h3 class="text-green-400 font-bold mb-2 border-b border-green-900 inline-block">BLUEPRINT LOGIC:</h3><ul id="clue-list" class="space-y-2 text-gray-300 font-mono list-disc pl-4"><li>Initializing...</li></ul></div>
+        <div class="flex flex-col gap-2"><div class="text-xs text-center text-gray-500 tracking-widest">ASSEMBLY SEQUENCE</div><div class="grid grid-cols-5 gap-2 h-20 md:h-24" id="slots-container"></div></div>
+        <div class="flex-1 flex flex-col justify-end"><div class="text-xs text-center text-gray-500 mb-2 tracking-widest">AVAILABLE COMPONENTS</div><div id="inventory" class="grid grid-cols-5 gap-2"></div></div>
+        <button onclick="checkSolution()" class="w-full bg-green-900 hover:bg-green-700 text-green-100 font-bold py-4 rounded border border-green-500 shadow-[0_0_15px_rgba(0,255,0,0.3)] transition-all active:scale-95 uppercase tracking-widest mt-2 touch-manipulation"><i class="fa-solid fa-power-off mr-2"></i> Initiate Sequence</button>
     </main>
 
-    <!-- Result Overlay -->
-    <div id="result-screen" class="hidden fixed inset-0 z-50 bg-black flex flex-col items-center justify-center text-center p-6">
+    <div id="result-screen" class="hidden fixed inset-0 z-[60] bg-black flex flex-col items-center justify-center text-center p-6">
         <div id="result-icon" class="text-6xl mb-6"></div>
         <h2 id="result-title" class="text-3xl font-bold mb-2 uppercase"></h2>
         <p id="result-msg" class="text-gray-400 mb-8 font-mono max-w-md"></p>
-        
-        <div class="border-2 border-gray-700 p-8 rounded-lg bg-gray-900 mb-8">
-            <div class="text-sm text-gray-500 uppercase tracking-widest mb-2">Final Score</div>
-            <div id="final-score" class="text-white">0</div>
-        </div>
-
-        <button onclick="startGame()" class="px-8 py-3 bg-white text-black font-bold rounded hover:bg-gray-300">
-            REBOOT SYSTEM
-        </button>
+        <!-- Status Message for Admin Logging -->
+        <div id="admin-status" class="text-xs text-yellow-500 font-mono mb-4 border border-yellow-900 p-2 rounded bg-black"></div>
+        <button onclick="startGame()" class="px-8 py-3 bg-white text-black font-bold rounded hover:bg-gray-300 touch-manipulation">REBOOT SYSTEM</button>
     </div>
 
-    <!-- Instructions Overlay (Start Screen) -->
-    <div id="start-screen" class="fixed inset-0 z-50 bg-gray-900 flex flex-col items-center justify-center text-center p-6">
+    <div id="start-screen" class="fixed inset-0 z-[70] bg-gray-900 flex flex-col items-center justify-center text-center p-6">
         <i class="fa-solid fa-microchip text-green-500 text-6xl mb-6 animate-pulse"></i>
         <h1 class="text-4xl font-bold text-white mb-2 tracking-widest glitch-text">OMEGA BUILD</h1>
-        <p class="text-gray-400 mb-8 max-w-md leading-relaxed">
-            1. Assemble the <span class="text-white font-bold">5 components</span> in the correct logic sequence.
-            <br>
-            2. <span class="text-orange-500 font-bold">WARNING:</span> Reactor Flux levels are unstable. Use the <span class="border border-orange-500 text-orange-400 px-1 text-xs">PURGE</span> button to prevent meltdown while solving.
-            <br><br>
-            <span class="text-yellow-400 text-sm"><i class="fa-solid fa-triangle-exclamation"></i> Logic calibrated. Puzzle is always solvable.</span>
-        </p>
-        <button onclick="startGame()" class="px-8 py-4 bg-green-600 text-white font-bold rounded shadow-[0_0_20px_rgba(0,255,0,0.5)] hover:bg-green-500 transition-all">
-            START ASSEMBLY
-        </button>
+        <p class="text-gray-400 mb-8 max-w-md leading-relaxed">1. Assemble the 5 components.<br>2. PURGE heat to prevent meltdown.</p>
+        <button id="start-btn" class="px-8 py-4 bg-green-600 text-white font-bold rounded shadow-[0_0_20px_rgba(0,255,0,0.5)] hover:bg-green-500 transition-all active:scale-95 touch-manipulation cursor-pointer">START ASSEMBLY</button>
     </div>
 
     <script>
-        // --- Game Configuration ---
-        const GAME_DURATION = 45; // Seconds
-        const FLUX_INCREASE_RATE = 0.4; // Flux per tick
-        const FLUX_PURGE_AMOUNT = 20;   // How much purge reduces flux
-        
-        // --- Data Definitions ---
-        // ADDED: Plasma Cell component
+        // Init Telegram
+        let tg = null;
+        try { if(window.Telegram && window.Telegram.WebApp) { tg = window.Telegram.WebApp; tg.ready(); tg.expand(); tg.setHeaderColor('#0a0a0f'); tg.setBackgroundColor('#0a0a0f'); } } catch(e){}
+
         const COMPONENTS = [
             { id: 'core', name: 'Quantum Core', icon: 'fa-atom', color: 'text-purple-400', border: 'border-purple-500' },
             { id: 'chip', name: 'Logic Chip', icon: 'fa-microchip', color: 'text-blue-400', border: 'border-blue-500' },
@@ -250,249 +76,169 @@
             { id: 'plasma', name: 'Plasma Cell', icon: 'fa-dna', color: 'text-pink-400', border: 'border-pink-500' }
         ];
 
-        // --- State Variables ---
-        let timer = GAME_DURATION;
-        let instability = 0; // 0 to 100
-        let gameInterval;
-        let solution = []; // The correct order of IDs
-        // UPDATED: Array length 5
-        let placedItems = [null, null, null, null, null]; 
-        let selectedComponent = null;
+        let timer = 45, instability = 0, gameInterval, solution = [], placedItems = [null,null,null,null,null], selectedComponent = null;
 
-        // --- DOM Elements ---
-        const timerDisplay = document.getElementById('timer-display');
-        const timerBar = document.getElementById('timer-bar');
-        const instabilityBar = document.getElementById('instability-bar');
-        const instabilityText = document.getElementById('instability-text');
-        const gameBody = document.getElementById('game-body');
-        
-        const inventoryEl = document.getElementById('inventory');
-        const clueListEl = document.getElementById('clue-list');
-        const resultScreen = document.getElementById('result-screen');
-        const startScreen = document.getElementById('start-screen');
+        // UI Refs
+        const els = {
+            timer: document.getElementById('timer-display'),
+            bar: document.getElementById('timer-bar'),
+            fluxBar: document.getElementById('instability-bar'),
+            fluxText: document.getElementById('instability-text'),
+            body: document.getElementById('game-body'),
+            inv: document.getElementById('inventory'),
+            slots: document.getElementById('slots-container'),
+            clues: document.getElementById('clue-list'),
+            result: document.getElementById('result-screen'),
+            start: document.getElementById('start-screen'),
+            adminStatus: document.getElementById('admin-status')
+        };
 
-        // --- Game Logic ---
+        document.getElementById('start-btn').addEventListener('click', startGame);
 
         function startGame() {
-            // Reset UI
-            startScreen.classList.add('hidden');
-            resultScreen.classList.add('hidden');
-            placedItems = [null, null, null, null, null];
+            els.start.classList.add('hidden');
+            els.result.classList.add('hidden');
+            placedItems = [null,null,null,null,null];
             selectedComponent = null;
-            timer = GAME_DURATION;
+            timer = 45;
             instability = 0;
-            
-            gameBody.className = "h-screen flex flex-col items-center justify-between p-4 relative"; // Reset shakes
-            
-            // Generate Puzzle
+            els.body.className = "h-screen w-screen flex flex-col items-center justify-between p-4 relative overflow-hidden";
             generatePuzzle();
-            renderInventory();
-            renderSlots();
-            
-            // Start Loop
-            clearInterval(gameInterval);
-            updateDisplays();
+            render();
+            if(gameInterval) clearInterval(gameInterval);
             gameInterval = setInterval(gameLoop, 100);
         }
 
         function gameLoop() {
-            // 1. Time Logic
             timer -= 0.1;
-            
-            // 2. Instability Logic (Increases automatically)
-            instability += FLUX_INCREASE_RATE;
-            
-            updateDisplays();
-
-            // Check Failure Conditions
-            if (timer <= 0) {
-                endGame(false, "TEMPORAL DESTABILIZATION DETECTED. TIME EXPIRED.");
-            } else if (instability >= 100) {
-                endGame(false, "CRITICAL MELTDOWN. FLUX LEVELS EXCEEDED.");
-            }
+            instability += 0.4;
+            updateUI();
+            if(timer <= 0) endGame(false, "TIME EXPIRED");
+            else if(instability >= 100) endGame(false, "REACTOR MELTDOWN");
         }
 
-        function updateDisplays() {
-            // Timer UI
-            timerDisplay.textContent = Math.max(0, timer).toFixed(2);
-            const timePct = (timer / GAME_DURATION) * 100;
-            timerBar.style.width = `${timePct}%`;
+        function updateUI() {
+            els.timer.textContent = Math.max(0, timer).toFixed(2);
+            els.bar.style.width = `${(timer/45)*100}%`;
+            instability = Math.min(100, Math.max(0, instability));
+            els.fluxBar.style.width = `${instability}%`;
+            els.fluxText.textContent = Math.floor(instability) + "%";
             
-            if (timer < 10) {
-                timerDisplay.classList.add('animate-pulse');
-                timerBar.className = "h-full bg-white w-full transition-all duration-100"; // Flash white
+            if(instability > 75) {
+                els.body.classList.add('shake', 'danger-bg');
+                els.fluxBar.classList.replace('bg-orange-500', 'bg-red-500');
             } else {
-                timerDisplay.classList.remove('animate-pulse');
-                timerBar.className = "h-full bg-red-600 w-full transition-all duration-100";
-            }
-
-            // Instability UI
-            instability = Math.min(100, Math.max(0, instability)); // Clamp
-            instabilityBar.style.width = `${instability}%`;
-            instabilityText.textContent = `${Math.floor(instability)}%`;
-
-            // Instability Visual Feedback
-            if (instability > 75) {
-                gameBody.classList.add('shake');
-                gameBody.classList.add('danger-bg');
-                instabilityBar.classList.remove('bg-orange-500');
-                instabilityBar.classList.add('bg-red-500');
-            } else {
-                gameBody.classList.remove('shake');
-                gameBody.classList.remove('danger-bg');
-                instabilityBar.classList.add('bg-orange-500');
-                instabilityBar.classList.remove('bg-red-500');
+                els.body.classList.remove('shake', 'danger-bg');
+                els.fluxBar.classList.replace('bg-red-500', 'bg-orange-500');
             }
         }
 
-        function purgeHeat() {
-            if (timer > 0) {
-                instability -= FLUX_PURGE_AMOUNT;
-                updateDisplays();
-            }
-        }
+        window.purgeHeat = () => { if(timer > 0) instability -= 20; updateUI(); };
 
         function generatePuzzle() {
-            // 1. Shuffle components to create a random solution
             let shuffled = [...COMPONENTS].sort(() => Math.random() - 0.5);
             solution = shuffled.map(c => c.id);
-            console.log("Debug Solution:", solution);
-
-            // 2. Generate Guaranteed Solvable Clues for 5 items
-            const clues = [];
             const getName = (id) => COMPONENTS.find(c => c.id === id).name;
-
-            // --- Clue 1: The First (Index 0) ---
-            clues.push(`The <span class="text-green-400 font-bold">${getName(solution[0])}</span> is installed in the <span class="text-white">first slot</span>.`);
-
-            // --- Clue 2: The Second (Index 1) ---
-            clues.push(`The <span class="text-green-400 font-bold">${getName(solution[1])}</span> is immediately adjacent to the <span class="text-green-400 font-bold">${getName(solution[0])}</span>.`);
-
-            // --- Clue 3: The Last (Index 4) - NEW ---
-            clues.push(`The <span class="text-green-400 font-bold">${getName(solution[4])}</span> is installed in the <span class="text-white">final slot (V)</span>.`);
-
-            // --- Clue 4: The Middle Two (Indices 2 & 3) ---
-            // With 0, 1, and 4 known, only 2 and 3 are left. This relative clue solves them.
-            clues.push(`The <span class="text-green-400 font-bold">${getName(solution[2])}</span> connects before the <span class="text-green-400 font-bold">${getName(solution[3])}</span>.`);
-
-            // 3. Shuffle clue display order
-            clues.sort(() => Math.random() - 0.5);
-
-            // Render Clues
-            clueListEl.innerHTML = clues.map(c => `<li class="leading-relaxed border-l-2 border-gray-700 pl-2 mb-2">${c}</li>`).join('');
+            const clues = [
+                `The <span class="text-green-400 font-bold">${getName(solution[0])}</span> is in slot I.`,
+                `The <span class="text-green-400 font-bold">${getName(solution[1])}</span> is next to the <span class="text-green-400 font-bold">${getName(solution[0])}</span>.`,
+                `The <span class="text-green-400 font-bold">${getName(solution[4])}</span> is in slot V.`,
+                `The <span class="text-green-400 font-bold">${getName(solution[2])}</span> is before the <span class="text-green-400 font-bold">${getName(solution[3])}</span>.`
+            ].sort(() => Math.random() - 0.5);
+            els.clues.innerHTML = clues.map(c => `<li class="leading-relaxed border-l-2 border-gray-700 pl-2 mb-2">${c}</li>`).join('');
         }
 
-        // --- Interaction Logic ---
-
-        function renderInventory() {
-            inventoryEl.innerHTML = COMPONENTS.map(comp => {
-                const isPlaced = placedItems.includes(comp.id);
-                const isSelected = selectedComponent && selectedComponent.id === comp.id;
-                
-                return `
-                <div class="item border ${comp.border} bg-gray-900 rounded p-1 md:p-2 flex flex-col items-center justify-center h-20 
-                            ${isPlaced ? 'placed' : ''} ${isSelected ? 'selected' : ''}" 
-                     onclick="selectComponent('${comp.id}')">
-                    <i class="fa-solid ${comp.icon} ${comp.color} text-2xl mb-1"></i>
-                    <span class="text-[0.6rem] uppercase tracking-wider text-gray-400 text-center leading-tight">${comp.name}</span>
-                </div>
-                `;
+        function render() {
+            // Inventory
+            els.inv.innerHTML = COMPONENTS.map(c => {
+                const placed = placedItems.includes(c.id);
+                const sel = selectedComponent?.id === c.id;
+                return `<div class="item border ${c.border} bg-gray-900 rounded p-1 flex flex-col items-center justify-center h-20 ${placed?'placed':''} ${sel?'selected':''}" onclick="select('${c.id}')"><i class="fa-solid ${c.icon} ${c.color} text-2xl"></i><span class="text-[0.6rem] uppercase tracking-wider text-gray-400">${c.name}</span></div>`
+            }).join('');
+            
+            // Slots
+            els.slots.innerHTML = placedItems.map((pid, i) => {
+                const c = pid ? COMPONENTS.find(x => x.id === pid) : null;
+                const active = selectedComponent && !pid ? 'active border-green-500' : 'border-gray-600';
+                return `<div class="slot border-2 border-dashed rounded bg-black/50 flex items-center justify-center relative cursor-pointer ${active}" onclick="slotClick(${i})"><span class="absolute top-1 left-2 text-xs text-gray-600 font-bold">${['I','II','III','IV','V'][i]}</span><div class="text-3xl text-gray-700">${c ? `<i class="fa-solid ${c.icon} ${c.color}"></i>` : '<i class="fa-solid fa-plus"></i>'}</div></div>`
             }).join('');
         }
 
-        function renderSlots() {
-            // Update the visual state of the 5 slots
-            for (let i = 0; i < 5; i++) {
-                const slotContent = document.getElementById(`slot-${i}-content`);
-                const slotEl = slotContent.parentElement;
-                const itemId = placedItems[i];
-                
-                // Active slot styling
-                if (selectedComponent && !itemId) {
-                    slotEl.classList.add('active');
-                    slotEl.classList.remove('border-gray-600');
-                    slotEl.classList.add('border-green-500');
-                } else {
-                    slotEl.classList.remove('active');
-                    slotEl.classList.add('border-gray-600');
-                    slotEl.classList.remove('border-green-500');
-                }
-                
-                if (itemId) {
-                    const comp = COMPONENTS.find(c => c.id === itemId);
-                    slotContent.innerHTML = `<i class="fa-solid ${comp.icon} ${comp.color}"></i>`;
-                } else {
-                    slotContent.innerHTML = `<i class="fa-solid fa-plus text-gray-700"></i>`;
-                }
-            }
-        }
+        window.select = (id) => {
+            if(!placedItems.includes(id)) selectedComponent = selectedComponent?.id === id ? null : COMPONENTS.find(c => c.id === id);
+            render();
+        };
 
-        function selectComponent(id) {
-            if (placedItems.includes(id)) return;
+        window.slotClick = (i) => {
+            if(selectedComponent) { placedItems[i] = selectedComponent.id; selectedComponent = null; }
+            else placedItems[i] = null;
+            render();
+        };
 
-            if (selectedComponent && selectedComponent.id === id) {
-                selectedComponent = null;
-            } else {
-                selectedComponent = COMPONENTS.find(c => c.id === id);
-            }
-            renderInventory();
-            renderSlots();
-        }
-
-        function handleSlotClick(index) {
-            if (selectedComponent) {
-                placedItems[index] = selectedComponent.id;
-                selectedComponent = null;
-            } else {
-                placedItems[index] = null;
-            }
-            
-            renderInventory();
-            renderSlots();
-        }
-
-        function checkSolution() {
+        window.checkSolution = () => {
+            if(placedItems.includes(null)) return alert("FILL ALL SLOTS");
             clearInterval(gameInterval);
-            gameBody.className = "h-screen flex flex-col items-center justify-between p-4 relative"; 
+            const win = placedItems.every((val, i) => val === solution[i]);
+            endGame(win, win ? "SEQUENCE VERIFIED" : "SEQUENCE FAILED");
+        };
 
-            // Check if all slots filled
-            if (placedItems.includes(null)) {
-                alert("ERROR: INCOMPLETE ASSEMBLY. FILL ALL 5 SLOTS.");
-                gameInterval = setInterval(gameLoop, 100);
-                return;
-            }
-
-            // Check if order matches solution
-            const isCorrect = placedItems.every((val, index) => val === solution[index]);
-
-            if (isCorrect) {
-                endGame(true, "SEQUENCE VERIFIED. SYSTEM STABILIZED.");
-            } else {
-                endGame(false, "FATAL ERROR: INCORRECT SEQUENCE. CRITICAL FAILURE.");
-            }
-        }
-
-        function endGame(isWin, message) {
+        function endGame(win, msg) {
             clearInterval(gameInterval);
-            gameBody.classList.remove('shake');
-            resultScreen.classList.remove('hidden');
+            els.body.className = "h-screen w-screen flex flex-col items-center justify-between p-4 relative overflow-hidden";
+            els.result.classList.remove('hidden');
             
-            const title = document.getElementById('result-title');
-            const msg = document.getElementById('result-msg');
-            const scoreEl = document.getElementById('final-score');
-            const icon = document.getElementById('result-icon');
+            document.getElementById('result-title').textContent = win ? "MISSION ACCOMPLISHED" : "MISSION FAILED";
+            document.getElementById('result-title').className = win ? "text-3xl font-bold mb-2 uppercase text-green-500" : "text-3xl font-bold mb-2 uppercase text-red-500";
+            document.getElementById('result-msg').textContent = msg;
+            document.getElementById('result-icon').innerHTML = win ? '<i class="fa-solid fa-check-circle text-green-500"></i>' : '<i class="fa-solid fa-bomb text-red-600"></i>';
 
-            title.textContent = isWin ? "MISSION ACCOMPLISHED" : "MISSION FAILED";
-            title.className = isWin ? "text-3xl font-bold mb-2 uppercase text-green-500" : "text-3xl font-bold mb-2 uppercase text-red-500";
-            
-            msg.textContent = message;
-            
-            scoreEl.textContent = isWin ? "1" : "0";
-            scoreEl.className = isWin ? "text-green-500" : "text-red-600";
-            
-            icon.innerHTML = isWin ? '<i class="fa-solid fa-check-circle text-green-500"></i>' : '<i class="fa-solid fa-bomb text-red-600"></i>';
+            sendResultToAdmin(win);
         }
 
+        async function sendResultToAdmin(isWin) {
+            const statusEl = els.adminStatus;
+            statusEl.innerHTML = "<i class='fa-solid fa-spinner animate-spin'></i> Transmitting logs...";
+
+            // 1. Get User Data or use Anonymous fallback
+            let userData = {
+                userId: 0,
+                username: "Anonymous",
+                firstName: "Unknown Agent"
+            };
+
+            if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                userData = tg.initDataUnsafe.user;
+            } else {
+                console.warn("No Telegram User detected. Using Anonymous mode.");
+            }
+
+            try {
+                // 2. Send to Vercel Backend
+                const response = await fetch('/api/submit-score', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: userData.id || 0,
+                        username: userData.username || 'Hidden',
+                        firstName: userData.first_name || 'Agent',
+                        outcome: isWin ? "WIN" : "LOSS"
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    statusEl.innerHTML = "<i class='fa-solid fa-check text-green-500'></i> Log Sent to HQ";
+                    statusEl.className = "text-xs text-green-500 font-mono mb-4 border border-green-900 p-2 rounded bg-black";
+                } else {
+                    console.error("Backend Error:", result);
+                    statusEl.innerHTML = `<i class='fa-solid fa-triangle-exclamation text-red-500'></i> Server Error: ${result.error || 'Unknown'}`;
+                }
+            } catch (err) {
+                console.error("Network Error:", err);
+                statusEl.innerHTML = "<i class='fa-solid fa-wifi text-red-500'></i> Connection Failed. Check Console.";
+            }
+        }
     </script>
 </body>
 </html>
