@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Protocol: OMEGA - Device Assembly</title>
-    <!-- Telegram Web App SDK -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome for Icons -->
@@ -215,15 +213,9 @@
             <div id="final-score" class="text-white">0</div>
         </div>
 
-        <!-- Actions -->
-        <div class="flex flex-col gap-3 w-full max-w-xs">
-            <button onclick="submitToTelegram()" id="btn-submit" class="w-full px-8 py-4 bg-green-800 text-white font-bold rounded hover:bg-green-700 border border-green-500 shadow-[0_0_10px_rgba(0,255,0,0.3)] flex items-center justify-center gap-2">
-                <i class="fa-brands fa-telegram"></i> TRANSMIT LOGS
-            </button>
-            <button onclick="startGame()" class="w-full px-8 py-3 bg-white text-black font-bold rounded hover:bg-gray-300">
-                REBOOT SYSTEM
-            </button>
-        </div>
+        <button onclick="startGame()" class="px-8 py-3 bg-white text-black font-bold rounded hover:bg-gray-300">
+            REBOOT SYSTEM
+        </button>
     </div>
 
     <!-- Instructions Overlay (Start Screen) -->
@@ -243,17 +235,6 @@
     </div>
 
     <script>
-        // --- Telegram Setup ---
-        const tg = window.Telegram.WebApp;
-        
-        // Initialize Telegram Web App
-        tg.ready();
-        tg.expand(); // Requests full screen
-        
-        // Match Theme Color
-        tg.setHeaderColor('#0a0a0f'); // Set header to our bg color
-        tg.setBackgroundColor('#0a0a0f');
-
         // --- Game Configuration ---
         const GAME_DURATION = 45; // Seconds
         const FLUX_INCREASE_RATE = 0.4; // Flux per tick
@@ -274,9 +255,9 @@
         let instability = 0; // 0 to 100
         let gameInterval;
         let solution = []; // The correct order of IDs
+        // UPDATED: Array length 5
         let placedItems = [null, null, null, null, null]; 
         let selectedComponent = null;
-        let gameResultData = null; // Store result for transmission
 
         // --- DOM Elements ---
         const timerDisplay = document.getElementById('timer-display');
@@ -289,7 +270,6 @@
         const clueListEl = document.getElementById('clue-list');
         const resultScreen = document.getElementById('result-screen');
         const startScreen = document.getElementById('start-screen');
-        const btnSubmit = document.getElementById('btn-submit');
 
         // --- Game Logic ---
 
@@ -301,7 +281,6 @@
             selectedComponent = null;
             timer = GAME_DURATION;
             instability = 0;
-            gameResultData = null;
             
             gameBody.className = "h-screen flex flex-col items-center justify-between p-4 relative"; // Reset shakes
             
@@ -512,17 +491,8 @@
             scoreEl.className = isWin ? "text-green-500" : "text-red-600";
             
             icon.innerHTML = isWin ? '<i class="fa-solid fa-check-circle text-green-500"></i>' : '<i class="fa-solid fa-bomb text-red-600"></i>';
-
-            // Store result for telegram
-            gameResultData = {
-                outcome: isWin ? "WIN" : "LOSS",
-                score: isWin ? 1 : 0
-            };
         }
 
-        // --- Telegram Submit Logic ---
-        function submitToTelegram() {
-            if (!gameResultData) return;
-
-            // Get User Data safely
-            const user = tg.initDataUnsafe?.
+    </script>
+</body>
+</html>
