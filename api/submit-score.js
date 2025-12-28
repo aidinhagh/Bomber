@@ -1,21 +1,27 @@
 export default async function handler(request, response) {
-    // 1. Only allow POST requests
     if (request.method !== 'POST') {
         return response.status(405).json({ error: 'Method not allowed' });
     }
 
-    // 2. Parse the body
-    const { userId, username, firstName, outcome } = request.body;
+    // Parse Body
+    let body = request.body;
+    if (typeof body === 'string') {
+        try { body = JSON.parse(body); } catch (e) {}
+    }
+    const { userId, username, firstName, outcome } = body;
 
-    // 3. Get Environment Variables (Set these in Vercel!)
+    // Get Env Vars
     const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
     const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID;
 
+    // Debug Log (Visible in Vercel Functions Logs)
+    console.log(`Processing score for: ${firstName} (@${username}) - Result: ${outcome}`);
+
     if (!BOT_TOKEN || !ADMIN_CHAT_ID) {
-        return response.status(500).json({ error: 'Server configuration error (Missing Env Vars)' });
+        console.error("ERROR: Missing TELEGRAM_BOT_TOKEN or ADMIN_CHAT_ID in Vercel Settings.");
+        return response.status(500).json({ error: 'Server Config Error: Missing API Keys' });
     }
 
-    // 4. Construct the message for the Admin
     const emoji = outcome === 'WIN' ? '✅' : '❌';
     const messageText = `
 ${emoji} <b>MISSION REPORT</b>
@@ -26,7 +32,6 @@ ${emoji} <b>MISSION REPORT</b>
     `;
 
     try {
-        // 5. Send to Telegram API
         const telegramUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
         
         const tgResponse = await fetch(telegramUrl, {
@@ -42,14 +47,14 @@ ${emoji} <b>MISSION REPORT</b>
         const data = await tgResponse.json();
 
         if (!data.ok) {
-            console.error('Telegram API Error:', data);
-            return response.status(500).json({ error: 'Failed to notify admin' });
+            console.error('Telegram API rejected the message:', data);
+            return response.status(500).json({ error: 'Telegram Error', details: data.description });
         }
 
         return response.status(200).json({ success: true });
 
     } catch (error) {
-        console.error('Function Error:', error);
+        console.error('Function execution error:', error);
         return response.status(500).json({ error: 'Internal Server Error' });
     }
 }
